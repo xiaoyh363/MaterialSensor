@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">蓝牙传感器</string>
+    <string name="txv_default">x =0.000 \ny =0.000 \nz =0.000 </string>
+    <string name="txv">x = %1$.2f\ny = %2$.2f\nz = %3$.2f</string>
+	<string name="search">搜索</string>
+	<string name="stop">停止</string>
+	<string name="connected_device">已连接设备：</string>
+	<string name="disconnect">断开</string>
+	<string name="acc">加速度计</string>
+	<string name="mag">磁力计</string>
+	<string name="gyr">陀螺仪</string>
+	
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
+</resources>
