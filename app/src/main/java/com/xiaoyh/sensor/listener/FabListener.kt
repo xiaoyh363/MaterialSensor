@@ -2,17 +2,18 @@ package com.xiaoyh.sensor.listener
 
 import android.bluetooth.BluetoothSocket
 import android.hardware.SensorManager
-import android.widget.CompoundButton
+import android.support.design.widget.FloatingActionButton
+import android.view.View
 import com.xiaoyh.sensor.MainActivity
+import com.xiaoyh.sensor.util.ConvertUtil
 import com.xiaoyh.sensor.util.LogUtil
 import com.xiaoyh.sensor.util.ToastUtil
-import com.xiaoyh.sensor.util.ConvertUtil
 
-// 管理传感器以及发送蓝牙数据的开关
-class MySwitchListener(
+class FabListener(
+    private val fab: FloatingActionButton,
     private val socket: BluetoothSocket?,
     private val sensorListener: MySensorListener
-) : CompoundButton.OnCheckedChangeListener {
+) : View.OnClickListener {
 
     // 定义蓝牙传输序列帧
     private val params = ByteArray(39) { i ->
@@ -26,11 +27,12 @@ class MySwitchListener(
 
     // 终止线程用变量
     @Volatile
-    private var running = false
+    var running = false
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onClick(v: View?) {
         running = !running
-        if (isChecked) {
+        if (running) {
+            fab.setImageResource(android.R.drawable.ic_media_pause)
             for (i in MainActivity.sensors) {
                 MainActivity.sm.registerListener(
                     sensorListener,
@@ -54,6 +56,7 @@ class MySwitchListener(
             }
             socket ?: ToastUtil.toast("蓝牙未连接")
         } else {
+            fab.setImageResource(android.R.drawable.ic_media_play)
             MainActivity.sm.unregisterListener(sensorListener)
         }
     }
@@ -75,6 +78,6 @@ class MySwitchListener(
                 params[3 + 4 * i + j] = bytes[j]
             }
         }
-        //Log.d(tag, bytes2float(float2bytes(17.625F)).toString())
+        // LogUtil.d(ConvertUtil.bytes2float(ConvertUtil.float2bytes(17.625F)).toString())
     }
 }

@@ -10,9 +10,9 @@ import android.os.Bundle
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.xiaoyh.sensor.listener.FabListener
 import com.xiaoyh.sensor.listener.MyListViewListener
 import com.xiaoyh.sensor.listener.MySensorListener
-import com.xiaoyh.sensor.listener.MySwitchListener
 import com.xiaoyh.sensor.util.LogUtil
 import com.xiaoyh.sensor.util.PermissionUtil
 import com.xiaoyh.sensor.util.ToastUtil
@@ -34,15 +34,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         lateinit var ba: BluetoothAdapter
         lateinit var sm: SensorManager
 
-        lateinit var acclineChart: MyLineChart
+        lateinit var accLineChart: MyLineChart
+        lateinit var magLineChart: MyLineChart
+        lateinit var gyrLineChart: MyLineChart
     }
 
-    private lateinit var lva: ListViewAdapter
+    private lateinit var lva: ListViewAdapter               // listView适配器
+    private lateinit var fabListener: FabListener           // FAB点击监听器
+    private var connectAsyncTask: ConnectAsyncTask? = null  // 蓝牙连接AsyncTask
+    private var socket: BluetoothSocket? = null             // 蓝牙Socket
 
-    private var connectAsyncTask: ConnectAsyncTask? = null
-    private var socket: BluetoothSocket? = null
-
-    // 蓝牙广播接受者
+    // 蓝牙广播接受者（待优化）
     private val bluetoothReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -74,22 +76,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // 获取传感器管理者
         sm = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        // 设置监听器（Switch 监听器内置了 Sensor 监听器）
-        sensor_swicth.setOnCheckedChangeListener(MySwitchListener(socket, MySensorListener(txv1, txv2, txv3)))
+        // 设置监听器（fab 点击监听器内置了 Sensor 监听器）
         blueListView.onItemClickListener = MyListViewListener(this, socket, connectAsyncTask)
-
-        acclineChart = MyLineChart(chart, "加速度计")
-
-        // 按钮注册
         search.setOnClickListener(this)
         stop.setOnClickListener(this)
         disconnect.setOnClickListener(this)
+        fabListener = FabListener(fab, socket, MySensorListener())
+        fab.setOnClickListener(fabListener)
+
+        // 折线图初始化
+        accLineChart = MyLineChart(chart_acc, "加速度计")
+        magLineChart = MyLineChart(chart_mag, "磁力计")
+        gyrLineChart = MyLineChart(chart_gyr, "陀螺仪")
 
         // 蓝牙部分初始化
         bluetoothInit()
-
-        // 注册广播（蓝牙扫描设备，扫描完成）
-        broadcastInit()
 
         // 权限申请
         PermissionUtil.getPermission(this)
@@ -112,7 +113,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         blueListView.adapter = lva
     }
 
-    private fun broadcastInit() {
+    // 退到桌面后再切换回APP，不会执行 onCreate 方法，但是蓝牙广播已经注销
+    // 所以必须在 onStart 方法中再次注册蓝牙广播
+    override fun onStart() {
+        super.onStart()
         val filter = IntentFilter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
@@ -120,11 +124,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onPause() {
-        sensor_swicth.isChecked = false
-        connectAsyncTask?.listener = null
+        if (fabListener.running) fab.performClick() // 关闭传感器即蓝牙的发送
+        connectAsyncTask?.listener = null           // 将连接AsyncTask的监听器置空（待优化）
+        disconnect.performClick()                   // 断开蓝牙
         try {
             // 处理广播未注册上的异常
-            unregisterReceiver(bluetoothReceiver)
+            unregisterReceiver(bluetoothReceiver)   // 注销广播，防止重复注册
         } catch (e: IllegalArgumentException) {
             ToastUtil.toast("请打开蓝牙后重启")
         }

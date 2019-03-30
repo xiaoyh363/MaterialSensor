@@ -22,8 +22,7 @@
 				android:id="@+id/search"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintBottom_toTopOf="@+id/blueListView"
-		/>
+				app:layout_constraintBottom_toTopOf="@+id/blueListView"/>
 		<Button
 				android:text="@string/stop"
 				android:layout_width="wrap_content"
@@ -32,15 +31,42 @@
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintTop_toTopOf="@+id/search"
 				app:layout_constraintBottom_toBottomOf="@+id/search"/>
+		
+		
 		<ListView
 				android:id="@+id/blueListView"
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/search"
-				android:layout_marginTop="16dp"/>
+				android:layout_marginTop="16dp"
+				app:layout_constraintBottom_toTopOf="@+id/disconnect"/>
+		
+		<TextView
+				android:id="@+id/useless"
+				android:text="@string/connected_device"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="@+id/disconnect"
+				app:layout_constraintBottom_toBottomOf="@+id/disconnect"/>
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/address"
+				android:textColor="@color/md_red_400"
+				app:layout_constraintStart_toEndOf="@+id/useless"
+				app:layout_constraintTop_toTopOf="@+id/useless"
+				app:layout_constraintBottom_toBottomOf="@+id/useless"/>
+		<Button
+				android:text="@string/disconnect"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/disconnect"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/blueListView"/>
 	
 	</android.support.constraint.ConstraintLayout>
 

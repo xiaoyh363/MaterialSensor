@@ -63,8 +63,8 @@ class MyLineChart(private val chart: LineChart, msg: String) {
         chart.data.notifyDataChanged()
         chart.notifyDataSetChanged()
         chart.invalidate()
-        chart.setVisibleXRangeMaximum(15f)
-        chart.moveViewToX(chart.data.entryCount - 15f)
+        chart.setVisibleXRangeMaximum(10f)
+        chart.moveViewToX(chart.data.entryCount - 10f)
     }
 
     fun addData(params: FloatArray) {

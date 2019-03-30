@@ -6,9 +6,6 @@
 	<string name="stop">停止</string>
 	<string name="connected_device">已连接设备：</string>
 	<string name="disconnect">断开</string>
-	<string name="acc">加速度计</string>
-	<string name="mag">磁力计</string>
-	<string name="gyr">陀螺仪</string>
 	
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
