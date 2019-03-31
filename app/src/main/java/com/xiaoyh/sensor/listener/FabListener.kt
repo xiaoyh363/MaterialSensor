@@ -1,6 +1,5 @@
 package com.xiaoyh.sensor.listener
 
-import android.bluetooth.BluetoothSocket
 import android.hardware.SensorManager
 import android.support.design.widget.FloatingActionButton
 import android.view.View
@@ -11,7 +10,6 @@ import com.xiaoyh.sensor.util.ToastUtil
 
 class FabListener(
     private val fab: FloatingActionButton,
-    private val socket: BluetoothSocket?,
     private val sensorListener: MySensorListener
 ) : View.OnClickListener {
 
@@ -40,13 +38,17 @@ class FabListener(
                     SensorManager.SENSOR_DELAY_NORMAL
                 )
             }
-            socket?.let {
+            MainActivity.socket?.let {
                 val tempOut = it.outputStream
                 Thread {
                     while (running) {
                         if (it.isConnected) {
                             bytes2params()
                             tempOut.write(params)
+                            // 绘制折线图（每秒）
+                            MainActivity.accLineChart.addData(MainActivity.accs)
+                            MainActivity.magLineChart.addData(MainActivity.mags)
+                            MainActivity.gyrLineChart.addData(MainActivity.gyrs)
                             Thread.sleep(996)
                         } else {
                             break
@@ -54,7 +56,7 @@ class FabListener(
                     }
                 }.start()
             }
-            socket ?: ToastUtil.toast("蓝牙未连接")
+            MainActivity.socket ?: ToastUtil.toast("蓝牙未连接")
         } else {
             fab.setImageResource(android.R.drawable.ic_media_play)
             MainActivity.sm.unregisterListener(sensorListener)

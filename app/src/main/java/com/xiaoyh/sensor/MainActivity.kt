@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         lateinit var ba: BluetoothAdapter
         lateinit var sm: SensorManager
 
+        var socket: BluetoothSocket? = null                 // 蓝牙Socket
+
         lateinit var accLineChart: MyLineChart
         lateinit var magLineChart: MyLineChart
         lateinit var gyrLineChart: MyLineChart
@@ -42,9 +44,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var lva: ListViewAdapter               // listView适配器
     private lateinit var fabListener: FabListener           // FAB点击监听器
     private var connectAsyncTask: ConnectAsyncTask? = null  // 蓝牙连接AsyncTask
-    private var socket: BluetoothSocket? = null             // 蓝牙Socket
 
-    // 蓝牙广播接受者（待优化）
+    // 蓝牙广播接受者
     private val bluetoothReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -77,17 +78,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         sm = getSystemService(SENSOR_SERVICE) as SensorManager
 
         // 设置监听器（fab 点击监听器内置了 Sensor 监听器）
-        blueListView.onItemClickListener = MyListViewListener(this, socket, connectAsyncTask)
+        blueListView.onItemClickListener = MyListViewListener(this, connectAsyncTask)
         search.setOnClickListener(this)
         stop.setOnClickListener(this)
         disconnect.setOnClickListener(this)
-        fabListener = FabListener(fab, socket, MySensorListener())
+        fabListener = FabListener(fab, MySensorListener())
         fab.setOnClickListener(fabListener)
 
         // 折线图初始化
-        accLineChart = MyLineChart(chart_acc, "加速度计")
-        magLineChart = MyLineChart(chart_mag, "磁力计")
-        gyrLineChart = MyLineChart(chart_gyr, "陀螺仪")
+        accLineChart = MyLineChart(chart_acc, "加速度计(m/s²)")
+        magLineChart = MyLineChart(chart_mag, "磁力计(uT)")
+        gyrLineChart = MyLineChart(chart_gyr, "陀螺仪(rad/s)")
 
         // 蓝牙部分初始化
         bluetoothInit()
@@ -125,7 +126,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onPause() {
         if (fabListener.running) fab.performClick() // 关闭传感器即蓝牙的发送
-        connectAsyncTask?.listener = null           // 将连接AsyncTask的监听器置空（待优化）
+        connectAsyncTask?.listener = null           // 将连接AsyncTask的监听器置空
         disconnect.performClick()                   // 断开蓝牙
         try {
             // 处理广播未注册上的异常

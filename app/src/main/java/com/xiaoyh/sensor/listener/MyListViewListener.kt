@@ -2,7 +2,6 @@ package com.xiaoyh.sensor.listener
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.bluetooth.BluetoothSocket
 import android.graphics.Color
 import android.support.v4.widget.DrawerLayout
 import android.view.View
@@ -10,6 +9,7 @@ import android.widget.AdapterView
 import android.widget.TextView
 import com.xiaoyh.sensor.MainActivity.Companion.ba
 import com.xiaoyh.sensor.MainActivity.Companion.mBlueList
+import com.xiaoyh.sensor.MainActivity.Companion.socket
 import com.xiaoyh.sensor.ConnectAsyncTask
 import com.xiaoyh.sensor.R
 import com.xiaoyh.sensor.util.ToastUtil
@@ -17,7 +17,6 @@ import java.util.*
 
 class MyListViewListener(
     private val activity: Activity,
-    private var socket: BluetoothSocket?,
     private var connectAsyncTask: ConnectAsyncTask?
 ) : AdapterView.OnItemClickListener {
 

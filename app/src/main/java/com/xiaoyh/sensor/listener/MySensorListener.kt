@@ -26,10 +26,10 @@ class MySensorListener : SensorEventListener {
             }
         }
 
-        // 绘制折线图
-        MainActivity.accLineChart.addData(MainActivity.accs)
+        // 绘制折线图（即时）
+        /*MainActivity.accLineChart.addData(MainActivity.accs)
         MainActivity.magLineChart.addData(MainActivity.mags)
-        MainActivity.gyrLineChart.addData(MainActivity.gyrs)
+        MainActivity.gyrLineChart.addData(MainActivity.gyrs)*/
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
