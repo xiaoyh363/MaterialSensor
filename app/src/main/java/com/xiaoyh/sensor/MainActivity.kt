@@ -57,6 +57,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> ToastUtil.toast("搜索结束")
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    disconnect.performClick()
+                }
             }
             LogUtil.d(mBlueList.size.toString())
         }
@@ -90,7 +93,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         magLineChart = MyLineChart(chart_mag, "磁力计(uT)")
         gyrLineChart = MyLineChart(chart_gyr, "陀螺仪(rad/s)")
 
-        // 蓝牙部分初始化
+        // 蓝牙初始化
         bluetoothInit()
 
         // 权限申请
@@ -103,7 +106,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // 若蓝牙没打开则打开它
         if (!ba.isEnabled) {
             startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 0)
+        } else {
+            bluetoothListInit()
         }
+    }
+
+    private fun bluetoothListInit() {
         // 为list添加以连接设备
         if (ba.bondedDevices.size > 0 && !mBlueList.containsAll(ba.bondedDevices)) {
             mBlueList.addAll(ba.bondedDevices)
@@ -114,14 +122,30 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         blueListView.adapter = lva
     }
 
+    // 注册蓝牙广播事件（设备找到、搜索结束、断开连接）
+    private fun broadcastInit() {
+        val filter = IntentFilter()
+        filter.addAction(BluetoothDevice.ACTION_FOUND)
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+        registerReceiver(bluetoothReceiver, filter)
+    }
+
+    // 响应打开蓝牙请求
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 0) {
+            // 蓝牙打开后再初始化蓝牙设备列表
+            bluetoothListInit()
+            // 若蓝牙未打开，则广播注册不会成功，需要再次注册
+            broadcastInit()
+        }
+    }
+
     // 退到桌面后再切换回APP，不会执行 onCreate 方法，但是蓝牙广播已经注销
     // 所以必须在 onStart 方法中再次注册蓝牙广播
     override fun onStart() {
         super.onStart()
-        val filter = IntentFilter()
-        filter.addAction(BluetoothDevice.ACTION_FOUND)
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-        registerReceiver(bluetoothReceiver, filter)
+        broadcastInit()
     }
 
     override fun onPause() {
@@ -154,8 +178,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         it.close()
                         address.text = ""
                         ToastUtil.toast("连接已断开")
-                    } else {
-                        ToastUtil.toast("当前无连接")
                     }
                 }
             }

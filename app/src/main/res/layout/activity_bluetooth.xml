@@ -55,7 +55,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:id="@+id/address"
-				android:textColor="@color/md_red_400"
+				android:textColor="@color/md_yellow_500"
 				app:layout_constraintStart_toEndOf="@+id/useless"
 				app:layout_constraintTop_toTopOf="@+id/useless"
 				app:layout_constraintBottom_toBottomOf="@+id/useless"/>

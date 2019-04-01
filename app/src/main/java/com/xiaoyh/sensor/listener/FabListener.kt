@@ -49,7 +49,7 @@ class FabListener(
                             MainActivity.accLineChart.addData(MainActivity.accs)
                             MainActivity.magLineChart.addData(MainActivity.mags)
                             MainActivity.gyrLineChart.addData(MainActivity.gyrs)
-                            Thread.sleep(996)
+                            Thread.sleep(970)
                         } else {
                             break
                         }
