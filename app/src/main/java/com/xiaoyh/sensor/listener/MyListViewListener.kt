@@ -23,32 +23,36 @@ class MyListViewListener(
     private val myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val device = mBlueList[position]
-        val dialog = AlertDialog.Builder(activity)
-            .setTitle("${device.name} / ${device.address}")
-            .setMessage("您确定要连接这个吗？")
-            .setPositiveButton("确定") { _, _ ->
-                if (ba.isDiscovering) {
-                    ba.cancelDiscovery()
-                }
-                socket = device.createRfcommSocketToServiceRecord(myUUID)
-                connectAsyncTask = ConnectAsyncTask(socket!!, object : ConnectAsyncTask.AsyncTaskListener {
-                    override fun onSuccess(result: Boolean) {
-                        if (result) {
-                            ToastUtil.toast("连接成功")
-                            activity.findViewById<TextView>(R.id.address).text = socket!!.remoteDevice.address
-                            activity.findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawers()
-                        } else {
-                            ToastUtil.toast("连接失败")
-                        }
+        if (ba.isEnabled) {
+            val device = mBlueList[position]
+            val dialog = AlertDialog.Builder(activity)
+                .setTitle("${device.name} / ${device.address}")
+                .setMessage("您确定要连接这个吗？")
+                .setPositiveButton("确定") { _, _ ->
+                    if (ba.isDiscovering) {
+                        ba.cancelDiscovery()
                     }
-                })
-                connectAsyncTask!!.execute()
-            }
-            .setNegativeButton("取消", null)
-            .create()
-        dialog.show()
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+                    socket = device.createRfcommSocketToServiceRecord(myUUID)
+                    connectAsyncTask = ConnectAsyncTask(socket!!, object : ConnectAsyncTask.AsyncTaskListener {
+                        override fun onSuccess(result: Boolean) {
+                            if (result) {
+                                ToastUtil.toast("连接成功")
+                                activity.findViewById<TextView>(R.id.address).text = socket!!.remoteDevice.address
+                                activity.findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawers()
+                            } else {
+                                ToastUtil.toast("连接失败")
+                            }
+                        }
+                    })
+                    connectAsyncTask!!.execute()
+                }
+                .setNegativeButton("取消", null)
+                .create()
+            dialog.show()
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+        } else {
+            ToastUtil.toast("请打开蓝牙")
+        }
     }
 }

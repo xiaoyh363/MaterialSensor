@@ -3,7 +3,7 @@ package com.xiaoyh.sensor.util
 import android.util.Log
 
 object LogUtil {
-    private const val tag = "xiaoyh.sensor"
+    private const val tag = "xiaoyh.sensor.log"
 
     private const val VERBOSE = 1
     private const val DEBUG = 2

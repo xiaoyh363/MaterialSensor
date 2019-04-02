@@ -57,9 +57,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> ToastUtil.toast("搜索结束")
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    disconnect.performClick()
-                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> disconnect.performClick()
             }
             LogUtil.d(mBlueList.size.toString())
         }
@@ -106,24 +104,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // 若蓝牙没打开则打开它
         if (!ba.isEnabled) {
             startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 0)
-        } else {
-            bluetoothListInit()
         }
-    }
-
-    private fun bluetoothListInit() {
         // 为list添加以连接设备
         if (ba.bondedDevices.size > 0 && !mBlueList.containsAll(ba.bondedDevices)) {
             mBlueList.addAll(ba.bondedDevices)
         }
-
         // 注册listView adapter
         lva = ListViewAdapter(mBlueList, this)
         blueListView.adapter = lva
     }
 
-    // 注册蓝牙广播事件（设备找到、搜索结束、断开连接）
-    private fun broadcastInit() {
+    override fun onResume() {
+        super.onResume()
+        // 注册蓝牙广播事件（设备找到、搜索结束、断开连接）
         val filter = IntentFilter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
@@ -131,44 +124,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         registerReceiver(bluetoothReceiver, filter)
     }
 
-    // 响应打开蓝牙请求
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 0) {
-            // 蓝牙打开后再初始化蓝牙设备列表
-            bluetoothListInit()
-            // 若蓝牙未打开，则广播注册不会成功，需要再次注册
-            broadcastInit()
-        }
-    }
-
-    // 退到桌面后再切换回APP，不会执行 onCreate 方法，但是蓝牙广播已经注销
-    // 所以必须在 onStart 方法中再次注册蓝牙广播
-    override fun onStart() {
-        super.onStart()
-        broadcastInit()
-    }
-
     override fun onPause() {
-        if (fabListener.running) fab.performClick() // 关闭传感器即蓝牙的发送
+        if (fabListener.running) fab.performClick() // 关闭传感器及蓝牙的发送
         connectAsyncTask?.listener = null           // 将连接AsyncTask的监听器置空
         disconnect.performClick()                   // 断开蓝牙
-        try {
-            // 处理广播未注册上的异常
-            unregisterReceiver(bluetoothReceiver)   // 注销广播，防止重复注册
-        } catch (e: IllegalArgumentException) {
-            ToastUtil.toast("请打开蓝牙后重启")
-        }
+        unregisterReceiver(bluetoothReceiver)       // 注销广播，防止重复注册
         super.onPause()
     }
 
     override fun onClick(v: View?) {
         when (v) {
             search -> {
-                if (!ba.isDiscovering) {
-                    ba.startDiscovery()
-                    ToastUtil.toast("开始搜索")
+                if (ba.isEnabled) {
+                    if (!ba.isDiscovering) {
+                        ba.startDiscovery()
+                        ToastUtil.toast("开始搜索")
+                    } else {
+                        ToastUtil.toast("正在搜索ing")
+                    }
                 } else {
-                    ToastUtil.toast("正在搜索ing")
+                    ToastUtil.toast("请打开蓝牙")
                 }
             }
             stop -> if (ba.isDiscovering) ba.cancelDiscovery()
