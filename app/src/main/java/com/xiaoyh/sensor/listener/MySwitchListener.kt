@@ -9,6 +9,9 @@ import com.xiaoyh.sensor.util.ToastUtil
 import com.xiaoyh.sensor.util.ConvertUtil
 
 // 管理传感器以及发送蓝牙数据的开关
+// 该类已被 fab 淘汰
+class MySwitchListener
+/*
 class MySwitchListener(
     private val socket: BluetoothSocket?,
     private val sensorListener: MySensorListener
@@ -77,4 +80,4 @@ class MySwitchListener(
         }
         //Log.d(tag, bytes2float(float2bytes(17.625F)).toString())
     }
-}
+}*/

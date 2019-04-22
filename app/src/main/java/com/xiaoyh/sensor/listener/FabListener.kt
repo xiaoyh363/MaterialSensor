@@ -1,5 +1,6 @@
 package com.xiaoyh.sensor.listener
 
+import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.support.design.widget.FloatingActionButton
 import android.view.View
@@ -12,6 +13,15 @@ class FabListener(
     private val fab: FloatingActionButton,
     private val sensorListener: MySensorListener
 ) : View.OnClickListener {
+
+    companion object {
+        val accs = FloatArray(3)
+        val mags = FloatArray(3)
+        val gyrs = FloatArray(3)
+    }
+
+    // 待用传感器数组：加速度计、磁力计、陀螺仪
+    private val sensors = intArrayOf(Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_GYROSCOPE)
 
     // 定义蓝牙传输序列帧
     private val params = ByteArray(39) { i ->
@@ -31,7 +41,7 @@ class FabListener(
         running = !running
         if (running) {
             fab.setImageResource(android.R.drawable.ic_media_pause)
-            for (i in MainActivity.sensors) {
+            for (i in sensors) {
                 MainActivity.sm.registerListener(
                     sensorListener,
                     MainActivity.sm.getDefaultSensor(i),
@@ -46,9 +56,9 @@ class FabListener(
                             bytes2params()
                             tempOut.write(params)
                             // 绘制折线图（每秒）
-                            MainActivity.accLineChart.addData(MainActivity.accs)
-                            MainActivity.magLineChart.addData(MainActivity.mags)
-                            MainActivity.gyrLineChart.addData(MainActivity.gyrs)
+                            MainActivity.accLineChart.addData(accs)
+                            MainActivity.magLineChart.addData(mags)
+                            MainActivity.gyrLineChart.addData(gyrs)
                             Thread.sleep(970)
                         } else {
                             break
@@ -64,7 +74,7 @@ class FabListener(
     }
 
     private fun bytes2params() {
-        val arrays = MainActivity.accs + MainActivity.mags + MainActivity.gyrs
+        val arrays = accs + mags + gyrs
         // accx 03-06 accy 07-10 accz 11-14
         // magx 15-18 magy 19-22 magz 23-26
         // gyrx 27-30 gyry 31-34 gyrz 35-38

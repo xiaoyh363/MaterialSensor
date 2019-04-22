@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.*
-import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.support.v7.app.ActionBarDrawerToggle
@@ -25,11 +24,6 @@ import kotlinx.android.synthetic.main.content_main.*
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
-        // 待用传感器数组：加速度计、磁力计、陀螺仪
-        val sensors = intArrayOf(Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_GYROSCOPE)
-        val accs = FloatArray(3)
-        val mags = FloatArray(3)
-        val gyrs = FloatArray(3)
         val mBlueList = mutableListOf<BluetoothDevice>()
         lateinit var ba: BluetoothAdapter
         lateinit var sm: SensorManager

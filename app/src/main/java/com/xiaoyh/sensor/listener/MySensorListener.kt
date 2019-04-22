@@ -11,25 +11,25 @@ class MySensorListener : SensorEventListener {
         when (event.sensor.type) {
             Sensor.TYPE_ACCELEROMETER -> {
                 for (i in 0..2) {
-                    MainActivity.accs[i] = event.values[i]
+                    FabListener.accs[i] = event.values[i]
                 }
             }
             Sensor.TYPE_MAGNETIC_FIELD -> {
                 for (i in 0..2) {
-                    MainActivity.mags[i] = event.values[i]
+                    FabListener.mags[i] = event.values[i]
                 }
             }
             Sensor.TYPE_GYROSCOPE -> {
                 for (i in 0..2) {
-                    MainActivity.gyrs[i] = event.values[i]
+                    FabListener.gyrs[i] = event.values[i]
                 }
             }
         }
 
         // 绘制折线图（即时）
-        /*MainActivity.accLineChart.addData(MainActivity.accs)
-        MainActivity.magLineChart.addData(MainActivity.mags)
-        MainActivity.gyrLineChart.addData(MainActivity.gyrs)*/
+        /*MainActivity.accLineChart.addData(FabListener.accs)
+        MainActivity.magLineChart.addData(FabListener.mags)
+        MainActivity.gyrLineChart.addData(FabListener.gyrs)*/
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
